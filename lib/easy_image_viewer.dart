@@ -30,13 +30,15 @@ const _defaultCloseButtonTooltip = 'Close';
 /// close button and is used for accessibility.
 /// The [closeButtonColor] defaults to white, but can be set to any other color.
 Future<Dialog?> showImageViewer(
-    BuildContext context, ImageProvider imageProvider,
-    {bool immersive = true,
-    void Function()? onViewerDismissed,
-    bool useSafeArea = false,
-    Color backgroundColor = _defaultBackgroundColor,
-    String closeButtonTooltip = _defaultCloseButtonTooltip,
-    Color closeButtonColor = _defaultCloseButtonColor}) {
+  BuildContext context,
+  ImageProvider imageProvider, {
+  bool immersive = true,
+  void Function()? onViewerDismissed,
+  bool useSafeArea = false,
+  Color backgroundColor = _defaultBackgroundColor,
+  String closeButtonTooltip = _defaultCloseButtonTooltip,
+  Color closeButtonColor = _defaultCloseButtonColor,
+}) {
   return showImageViewerPager(context, SingleImageProvider(imageProvider),
       immersive: immersive,
       onViewerDismissed:
@@ -58,15 +60,19 @@ Future<Dialog?> showImageViewer(
 /// The [closeButtonTooltip] text is displayed when the user long-presses on the
 /// close button and is used for accessibility.
 /// The [closeButtonColor] defaults to white, but can be set to any other color.
+
 Future<Dialog?> showImageViewerPager(
-    BuildContext context, EasyImageProvider imageProvider,
-    {bool immersive = true,
-    void Function(int)? onPageChanged,
-    void Function(int)? onViewerDismissed,
-    bool useSafeArea = false,
-    Color backgroundColor = _defaultBackgroundColor,
-    String closeButtonTooltip = _defaultCloseButtonTooltip,
-    Color closeButtonColor = _defaultCloseButtonColor}) {
+  BuildContext context,
+  EasyImageProvider imageProvider, {
+  bool immersive = true,
+  void Function(int)? onPageChanged,
+  void Function(int)? onViewerDismissed,
+  bool useSafeArea = false,
+  Widget? footer,
+  Color backgroundColor = _defaultBackgroundColor,
+  String closeButtonTooltip = _defaultCloseButtonTooltip,
+  Color closeButtonColor = _defaultCloseButtonColor,
+}) {
   if (immersive) {
     // Hide top and bottom bars
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
@@ -84,45 +90,54 @@ Future<Dialog?> showImageViewerPager(
   }
 
   return showDialog<Dialog>(
-      context: context,
-      useSafeArea: useSafeArea,
-      builder: (context) {
-        return Dialog(
-            backgroundColor: backgroundColor,
-            insetPadding: const EdgeInsets.all(0),
-            child: Stack(
-                clipBehavior: Clip.none,
-                alignment: Alignment.center,
-                children: <Widget>[
-                  EasyImageViewPager(
-                      easyImageProvider: imageProvider,
-                      pageController: pageController),
-                  Positioned(
-                      top: 5,
-                      right: 5,
-                      child: IconButton(
-                        icon: const Icon(Icons.close),
-                        color: closeButtonColor,
-                        tooltip: closeButtonTooltip,
-                        onPressed: () {
-                          Navigator.of(context).pop();
+    context: context,
+    useSafeArea: useSafeArea,
+    builder: (context) {
+      return Dialog(
+        backgroundColor: backgroundColor,
+        insetPadding: const EdgeInsets.all(0),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: <Widget>[
+            EasyImageViewPager(
+              easyImageProvider: imageProvider,
+              pageController: pageController,
+            ),
+            if (footer != null)
+              Positioned(
+                bottom: 10.0,
+                right: 10.0,
+                child: footer,
+              ),
+            Positioned(
+              top: 5,
+              right: 5,
+              child: IconButton(
+                icon: const Icon(Icons.close),
+                color: closeButtonColor,
+                tooltip: closeButtonTooltip,
+                onPressed: () {
+                  Navigator.of(context).pop();
 
-                          if (onViewerDismissed != null) {
-                            onViewerDismissed(
-                                pageController.page?.round() ?? 0);
-                          }
+                  if (onViewerDismissed != null) {
+                    onViewerDismissed(pageController.page?.round() ?? 0);
+                  }
 
-                          if (immersive) {
-                            SystemChrome.setEnabledSystemUIMode(
-                                SystemUiMode.edgeToEdge);
-                          }
-                          if (internalPageChangeListener != null) {
-                            pageController
-                                .removeListener(internalPageChangeListener);
-                          }
-                          pageController.dispose();
-                        },
-                      ))
-                ]));
-      });
+                  if (immersive) {
+                    SystemChrome.setEnabledSystemUIMode(
+                        SystemUiMode.edgeToEdge);
+                  }
+                  if (internalPageChangeListener != null) {
+                    pageController.removeListener(internalPageChangeListener);
+                  }
+                  pageController.dispose();
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
