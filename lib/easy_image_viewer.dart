@@ -35,11 +35,13 @@ Future<Dialog?> showImageViewer(
   bool immersive = true,
   void Function()? onViewerDismissed,
   bool useSafeArea = false,
+  Widget? footer,
   Color backgroundColor = _defaultBackgroundColor,
   String closeButtonTooltip = _defaultCloseButtonTooltip,
   Color closeButtonColor = _defaultCloseButtonColor,
 }) {
   return showImageViewerPager(context, SingleImageProvider(imageProvider),
+      footer: footer,
       immersive: immersive,
       onViewerDismissed:
           onViewerDismissed != null ? (_) => onViewerDismissed() : null,
